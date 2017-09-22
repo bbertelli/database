@@ -1,0 +1,1033 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.6.3
+-- Dumped by pg_dump version 9.6.3
+
+-- Started on 2017-09-13 10:42:05
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 1 (class 3079 OID 12387)
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 2239 (class 0 OID 0)
+-- Dependencies: 1
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = true;
+
+--
+-- TOC entry 185 (class 1259 OID 17013)
+-- Name: cliente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE cliente (
+    id_cliente integer NOT NULL,
+    nome character varying(100) NOT NULL,
+    cnpj character varying(45),
+    classificacao integer,
+    segmento character varying(45) NOT NULL,
+    endereco character varying(45) NOT NULL,
+    cidade character varying(45) NOT NULL,
+    estado character varying(45) NOT NULL,
+    pais character varying(45) NOT NULL,
+    atrasos smallint,
+    valor_atrasos numeric(10,0),
+    contato_padrao integer,
+    ativo smallint DEFAULT 1 NOT NULL,
+    cadastro_incompleto smallint DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE cliente OWNER TO postgres;
+
+--
+-- TOC entry 186 (class 1259 OID 17017)
+-- Name: cliente_id_cliente_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE cliente_id_cliente_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE cliente_id_cliente_seq OWNER TO postgres;
+
+--
+-- TOC entry 2241 (class 0 OID 0)
+-- Dependencies: 186
+-- Name: cliente_id_cliente_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE cliente_id_cliente_seq OWNED BY cliente.id_cliente;
+
+
+--
+-- TOC entry 187 (class 1259 OID 17019)
+-- Name: cliente_usuario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE cliente_usuario (
+    id_cliente_usuario integer NOT NULL,
+    id_cliente integer NOT NULL,
+    id_usuario integer NOT NULL,
+    favorito smallint NOT NULL
+);
+
+
+ALTER TABLE cliente_usuario OWNER TO postgres;
+
+--
+-- TOC entry 188 (class 1259 OID 17022)
+-- Name: cliente_usuario_id_cliente_usuario_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE cliente_usuario_id_cliente_usuario_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE cliente_usuario_id_cliente_usuario_seq OWNER TO postgres;
+
+--
+-- TOC entry 2244 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: cliente_usuario_id_cliente_usuario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE cliente_usuario_id_cliente_usuario_seq OWNED BY cliente_usuario.id_cliente_usuario;
+
+
+--
+-- TOC entry 189 (class 1259 OID 17024)
+-- Name: contato; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE contato (
+    id_contato integer NOT NULL,
+    nome character varying(45) NOT NULL,
+    apelido character varying(45),
+    funcao character varying(45) NOT NULL,
+    fone character varying(45) NOT NULL,
+    aniversario date,
+    email character varying(45) NOT NULL,
+    observacao character varying(100),
+    ativo smallint NOT NULL,
+    id_cliente integer NOT NULL,
+    cadastro_incompleto smallint DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE contato OWNER TO postgres;
+
+--
+-- TOC entry 190 (class 1259 OID 17027)
+-- Name: contato_id_contato_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE contato_id_contato_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE contato_id_contato_seq OWNER TO postgres;
+
+--
+-- TOC entry 2247 (class 0 OID 0)
+-- Dependencies: 190
+-- Name: contato_id_contato_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE contato_id_contato_seq OWNED BY contato.id_contato;
+
+
+--
+-- TOC entry 191 (class 1259 OID 17029)
+-- Name: funcao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE funcao (
+    id_funcao integer NOT NULL,
+    descricao character varying(45) NOT NULL
+);
+
+
+ALTER TABLE funcao OWNER TO postgres;
+
+--
+-- TOC entry 192 (class 1259 OID 17032)
+-- Name: funcao_id_funcao_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE funcao_id_funcao_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE funcao_id_funcao_seq OWNER TO postgres;
+
+--
+-- TOC entry 2250 (class 0 OID 0)
+-- Dependencies: 192
+-- Name: funcao_id_funcao_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE funcao_id_funcao_seq OWNED BY funcao.id_funcao;
+
+
+--
+-- TOC entry 193 (class 1259 OID 17034)
+-- Name: relacionamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE relacionamento (
+    id_relacionamento integer NOT NULL,
+    data_ultimo_followup date,
+    data_proximo_followup date,
+    id_cliente integer NOT NULL,
+    id_usuario integer NOT NULL,
+    id_contato integer NOT NULL,
+    id_situacao_relacionamento integer NOT NULL
+);
+
+
+ALTER TABLE relacionamento OWNER TO postgres;
+
+--
+-- TOC entry 194 (class 1259 OID 17037)
+-- Name: relacionamento_historico; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE relacionamento_historico (
+    id_relacionamento_historico integer NOT NULL,
+    data date,
+    observacao text NOT NULL,
+    id_relacionamento integer NOT NULL,
+    id_cliente integer NOT NULL,
+    id_usuario integer NOT NULL,
+    id_contato integer NOT NULL
+);
+
+
+ALTER TABLE relacionamento_historico OWNER TO postgres;
+
+--
+-- TOC entry 195 (class 1259 OID 17043)
+-- Name: relacionamento_historico_id_relacionamento_historico_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE relacionamento_historico_id_relacionamento_historico_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE relacionamento_historico_id_relacionamento_historico_seq OWNER TO postgres;
+
+--
+-- TOC entry 2254 (class 0 OID 0)
+-- Dependencies: 195
+-- Name: relacionamento_historico_id_relacionamento_historico_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE relacionamento_historico_id_relacionamento_historico_seq OWNED BY relacionamento_historico.id_relacionamento_historico;
+
+
+--
+-- TOC entry 196 (class 1259 OID 17045)
+-- Name: relacionamento_id_relacionamento_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE relacionamento_id_relacionamento_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE relacionamento_id_relacionamento_seq OWNER TO postgres;
+
+--
+-- TOC entry 2256 (class 0 OID 0)
+-- Dependencies: 196
+-- Name: relacionamento_id_relacionamento_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE relacionamento_id_relacionamento_seq OWNED BY relacionamento.id_relacionamento;
+
+
+--
+-- TOC entry 197 (class 1259 OID 17047)
+-- Name: situacao_relacionamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE situacao_relacionamento (
+    id_situacao_relacionamento integer NOT NULL,
+    descricao character varying(45)
+);
+
+
+ALTER TABLE situacao_relacionamento OWNER TO postgres;
+
+--
+-- TOC entry 198 (class 1259 OID 17050)
+-- Name: situacao_visita; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE situacao_visita (
+    id_situacao_visita integer NOT NULL,
+    descricao character varying(45)
+);
+
+
+ALTER TABLE situacao_visita OWNER TO postgres;
+
+--
+-- TOC entry 199 (class 1259 OID 17056)
+-- Name: usuario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE usuario (
+    id_usuario integer NOT NULL,
+    usuario character varying(20) NOT NULL,
+    senha text NOT NULL,
+    token text,
+    nome character varying(45) NOT NULL,
+    id_funcao integer NOT NULL,
+    ativo smallint DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE usuario OWNER TO postgres;
+
+--
+-- TOC entry 200 (class 1259 OID 17063)
+-- Name: usuario_id_usuario_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE usuario_id_usuario_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE usuario_id_usuario_seq OWNER TO postgres;
+
+--
+-- TOC entry 2261 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: usuario_id_usuario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE usuario_id_usuario_seq OWNED BY usuario.id_usuario;
+
+
+--
+-- TOC entry 201 (class 1259 OID 17070)
+-- Name: visita; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE visita (
+    id_visita integer NOT NULL,
+    data_planejada date,
+    data_fechamento date,
+    contato_planejado integer,
+    contato_realizado integer,
+    objetivos text,
+    reporte text,
+    duracao character varying(20),
+    audio_gravado character varying(45),
+    id_cliente integer NOT NULL,
+    id_usuario integer NOT NULL,
+    id_situacao_visita integer NOT NULL
+);
+
+
+ALTER TABLE visita OWNER TO postgres;
+
+--
+-- TOC entry 202 (class 1259 OID 17076)
+-- Name: visita_id_visita_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE visita_id_visita_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE visita_id_visita_seq OWNER TO postgres;
+
+--
+-- TOC entry 2264 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: visita_id_visita_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE visita_id_visita_seq OWNED BY visita.id_visita;
+
+
+--
+-- TOC entry 2055 (class 2604 OID 17078)
+-- Name: cliente id_cliente; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY cliente ALTER COLUMN id_cliente SET DEFAULT nextval('cliente_id_cliente_seq'::regclass);
+
+
+--
+-- TOC entry 2057 (class 2604 OID 17079)
+-- Name: cliente_usuario id_cliente_usuario; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY cliente_usuario ALTER COLUMN id_cliente_usuario SET DEFAULT nextval('cliente_usuario_id_cliente_usuario_seq'::regclass);
+
+
+--
+-- TOC entry 2058 (class 2604 OID 17080)
+-- Name: contato id_contato; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY contato ALTER COLUMN id_contato SET DEFAULT nextval('contato_id_contato_seq'::regclass);
+
+
+--
+-- TOC entry 2060 (class 2604 OID 17081)
+-- Name: funcao id_funcao; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY funcao ALTER COLUMN id_funcao SET DEFAULT nextval('funcao_id_funcao_seq'::regclass);
+
+
+--
+-- TOC entry 2061 (class 2604 OID 17082)
+-- Name: relacionamento id_relacionamento; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY relacionamento ALTER COLUMN id_relacionamento SET DEFAULT nextval('relacionamento_id_relacionamento_seq'::regclass);
+
+
+--
+-- TOC entry 2062 (class 2604 OID 17083)
+-- Name: relacionamento_historico id_relacionamento_historico; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY relacionamento_historico ALTER COLUMN id_relacionamento_historico SET DEFAULT nextval('relacionamento_historico_id_relacionamento_historico_seq'::regclass);
+
+
+--
+-- TOC entry 2064 (class 2604 OID 17084)
+-- Name: usuario id_usuario; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY usuario ALTER COLUMN id_usuario SET DEFAULT nextval('usuario_id_usuario_seq'::regclass);
+
+
+--
+-- TOC entry 2065 (class 2604 OID 17086)
+-- Name: visita id_visita; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY visita ALTER COLUMN id_visita SET DEFAULT nextval('visita_id_visita_seq'::regclass);
+
+
+--
+-- TOC entry 2215 (class 0 OID 17013)
+-- Dependencies: 185
+-- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY cliente (id_cliente, nome, cnpj, classificacao, segmento, endereco, cidade, estado, pais, atrasos, valor_atrasos, contato_padrao, ativo, cadastro_incompleto) FROM stdin;
+3	Metalurgica Teste Dois	\N	\N	Manufatura	Avenida 1	Sorocaba	SC	Brasil	0	0	\N	1	1
+2	ATM Digital	\N	\N	Software	Rua 1	Campinas	SP	Brasil	0	0	\N	1	1
+11	Microsoft de Indaiatuba	12312312	\N	Software	Av das Empresas	Indaiatuba	AC	Brasil	0	0	\N	1	1
+12	Apple de Campinas	56576	\N	Informática	Avenida dos Programadores	Campinas	AP	Brasil	0	0	\N	1	1
+1	Cliente de Teste do Brasil LTDA	53.113.791/0001-22	\N	Auto	Avenida Teste, 425	Indaiatuba	SP	Brasil	0	0	2	1	0
+14	Cliente para excluir	349827	\N					Brasil	0	0	\N	0	1
+15	JDM Soluções	10972565000161	\N	Oleo e Gás 	Rua 9 de julho	Indaiatuba	SP	Brasil	0	0	\N	1	0
+\.
+
+
+--
+-- TOC entry 2266 (class 0 OID 0)
+-- Dependencies: 186
+-- Name: cliente_id_cliente_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('cliente_id_cliente_seq', 15, true);
+
+
+--
+-- TOC entry 2217 (class 0 OID 17019)
+-- Dependencies: 187
+-- Data for Name: cliente_usuario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY cliente_usuario (id_cliente_usuario, id_cliente, id_usuario, favorito) FROM stdin;
+2	2	1	0
+3	3	1	0
+5	11	1	0
+1	1	1	1
+7	14	1	0
+6	12	1	1
+8	15	1	0
+\.
+
+
+--
+-- TOC entry 2267 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: cliente_usuario_id_cliente_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('cliente_usuario_id_cliente_usuario_seq', 8, true);
+
+
+--
+-- TOC entry 2219 (class 0 OID 17024)
+-- Dependencies: 189
+-- Data for Name: contato; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY contato (id_contato, nome, apelido, funcao, fone, aniversario, email, observacao, ativo, id_cliente, cadastro_incompleto) FROM stdin;
+1	Guilherme Dias	Gui Santana	Programador	19991480056	1995-05-17	gui.santana@gmail.com	O Guilherme é responsável por realizar compras de software na empresa.	1	1	1
+2	Jailson Almeida	Jailson Pai de Família	Ator	19991452356	1972-03-05	jailson@gmail.com	Recem chegado na empresa	1	1	1
+4	Bruno	Bertelli	Mobile Developer	19991480000	1989-11-21	bruno@gmail.com	Contato criado para testes	1	12	0
+5	Frodo	O escolhido	Hobbit	38759802	1980-01-04	frodo@sociedadedoanel.com	Responsável pela logística	1	15	0
+6	Carlos	Pinga	Motorista	19993750090	1975-10-10	carlos@gmail.com	Busca encomendas da empresa	1	15	0
+\.
+
+
+--
+-- TOC entry 2268 (class 0 OID 0)
+-- Dependencies: 190
+-- Name: contato_id_contato_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('contato_id_contato_seq', 6, true);
+
+
+--
+-- TOC entry 2221 (class 0 OID 17029)
+-- Dependencies: 191
+-- Data for Name: funcao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY funcao (id_funcao, descricao) FROM stdin;
+1	administrador
+\.
+
+
+--
+-- TOC entry 2269 (class 0 OID 0)
+-- Dependencies: 192
+-- Name: funcao_id_funcao_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('funcao_id_funcao_seq', 1, false);
+
+
+--
+-- TOC entry 2223 (class 0 OID 17034)
+-- Dependencies: 193
+-- Data for Name: relacionamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY relacionamento (id_relacionamento, data_ultimo_followup, data_proximo_followup, id_cliente, id_usuario, id_contato, id_situacao_relacionamento) FROM stdin;
+1	2017-06-19	2017-06-27	1	1	1	1
+\.
+
+
+--
+-- TOC entry 2224 (class 0 OID 17037)
+-- Dependencies: 194
+-- Data for Name: relacionamento_historico; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY relacionamento_historico (id_relacionamento_historico, data, observacao, id_relacionamento, id_cliente, id_usuario, id_contato) FROM stdin;
+1	2017-06-26	Falei com o cliente e ele me disse que daqui duas semanas terá uma demanda de dez licenças de software para comprar.	1	1	1	1
+\.
+
+
+--
+-- TOC entry 2270 (class 0 OID 0)
+-- Dependencies: 195
+-- Name: relacionamento_historico_id_relacionamento_historico_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('relacionamento_historico_id_relacionamento_historico_seq', 1, false);
+
+
+--
+-- TOC entry 2271 (class 0 OID 0)
+-- Dependencies: 196
+-- Name: relacionamento_id_relacionamento_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('relacionamento_id_relacionamento_seq', 1, false);
+
+
+--
+-- TOC entry 2227 (class 0 OID 17047)
+-- Dependencies: 197
+-- Data for Name: situacao_relacionamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY situacao_relacionamento (id_situacao_relacionamento, descricao) FROM stdin;
+1	Lead
+2	Orçamento
+3	Pedido
+\.
+
+
+--
+-- TOC entry 2228 (class 0 OID 17050)
+-- Dependencies: 198
+-- Data for Name: situacao_visita; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY situacao_visita (id_situacao_visita, descricao) FROM stdin;
+1	Agendada
+2	Realizada
+3	Cancelada
+\.
+
+
+--
+-- TOC entry 2229 (class 0 OID 17056)
+-- Dependencies: 199
+-- Data for Name: usuario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY usuario (id_usuario, usuario, senha, token, nome, id_funcao, ativo) FROM stdin;
+1	bruno	698dc19d489c4e4db73e28a713eab07b		Bruno	1	1
+\.
+
+
+--
+-- TOC entry 2272 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: usuario_id_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('usuario_id_usuario_seq', 1, false);
+
+
+--
+-- TOC entry 2231 (class 0 OID 17070)
+-- Dependencies: 201
+-- Data for Name: visita; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY visita (id_visita, data_planejada, data_fechamento, contato_planejado, contato_realizado, objetivos, reporte, duracao, audio_gravado, id_cliente, id_usuario, id_situacao_visita) FROM stdin;
+3	\N	2017-09-06	\N	2	\N	\N	\N	audio_visita_10239.mp3	1	1	2
+5	2017-09-15	\N	4	\N	Visita agendada para negociar alguns serviços.	\N	\N	\N	12	1	1
+6	2017-10-17	\N	5	\N	Conhecer a empresa e criar um relacionamento inicial para possível parceria.	\N	\N	\N	15	1	1
+\.
+
+
+--
+-- TOC entry 2273 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: visita_id_visita_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('visita_id_visita_seq', 6, true);
+
+
+--
+-- TOC entry 2067 (class 2606 OID 17110)
+-- Name: cliente cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY cliente
+    ADD CONSTRAINT cliente_pkey PRIMARY KEY (id_cliente);
+
+
+--
+-- TOC entry 2071 (class 2606 OID 17112)
+-- Name: cliente_usuario cliente_usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY cliente_usuario
+    ADD CONSTRAINT cliente_usuario_pkey PRIMARY KEY (id_cliente_usuario, id_cliente, id_usuario);
+
+
+--
+-- TOC entry 2074 (class 2606 OID 17114)
+-- Name: contato contato_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY contato
+    ADD CONSTRAINT contato_pkey PRIMARY KEY (id_contato, id_cliente);
+
+
+--
+-- TOC entry 2076 (class 2606 OID 17116)
+-- Name: funcao funcao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY funcao
+    ADD CONSTRAINT funcao_pkey PRIMARY KEY (id_funcao);
+
+
+--
+-- TOC entry 2085 (class 2606 OID 17118)
+-- Name: relacionamento_historico relacionamento_historico_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY relacionamento_historico
+    ADD CONSTRAINT relacionamento_historico_pkey PRIMARY KEY (id_relacionamento_historico, id_relacionamento, id_cliente, id_usuario, id_contato);
+
+
+--
+-- TOC entry 2082 (class 2606 OID 17120)
+-- Name: relacionamento relacionamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY relacionamento
+    ADD CONSTRAINT relacionamento_pkey PRIMARY KEY (id_relacionamento, id_cliente, id_usuario, id_contato, id_situacao_relacionamento);
+
+
+--
+-- TOC entry 2087 (class 2606 OID 17122)
+-- Name: situacao_relacionamento situacao_relacionamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY situacao_relacionamento
+    ADD CONSTRAINT situacao_relacionamento_pkey PRIMARY KEY (id_situacao_relacionamento);
+
+
+--
+-- TOC entry 2089 (class 2606 OID 17124)
+-- Name: situacao_visita situacao_visita_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY situacao_visita
+    ADD CONSTRAINT situacao_visita_pkey PRIMARY KEY (id_situacao_visita);
+
+
+--
+-- TOC entry 2092 (class 2606 OID 17128)
+-- Name: usuario usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY usuario
+    ADD CONSTRAINT usuario_pkey PRIMARY KEY (id_usuario, id_funcao);
+
+
+--
+-- TOC entry 2097 (class 2606 OID 17132)
+-- Name: visita visita_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY visita
+    ADD CONSTRAINT visita_pkey PRIMARY KEY (id_visita, id_cliente, id_usuario, id_situacao_visita);
+
+
+--
+-- TOC entry 2068 (class 1259 OID 17133)
+-- Name: cliente_usuario_id_cliente_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX cliente_usuario_id_cliente_idx ON cliente_usuario USING btree (id_cliente);
+
+
+--
+-- TOC entry 2069 (class 1259 OID 17134)
+-- Name: cliente_usuario_id_usuario_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX cliente_usuario_id_usuario_idx ON cliente_usuario USING btree (id_usuario);
+
+
+--
+-- TOC entry 2072 (class 1259 OID 17135)
+-- Name: contato_id_cliente_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX contato_id_cliente_idx ON contato USING btree (id_cliente);
+
+
+--
+-- TOC entry 2083 (class 1259 OID 17136)
+-- Name: relacionamento_historico_id_relacionamento_id_cliente_id_us_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX relacionamento_historico_id_relacionamento_id_cliente_id_us_idx ON relacionamento_historico USING btree (id_relacionamento, id_cliente, id_usuario, id_contato);
+
+
+--
+-- TOC entry 2077 (class 1259 OID 17137)
+-- Name: relacionamento_id_cliente_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX relacionamento_id_cliente_idx ON relacionamento USING btree (id_cliente);
+
+
+--
+-- TOC entry 2078 (class 1259 OID 17138)
+-- Name: relacionamento_id_contato_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX relacionamento_id_contato_idx ON relacionamento USING btree (id_contato);
+
+
+--
+-- TOC entry 2079 (class 1259 OID 17139)
+-- Name: relacionamento_id_situacao_relacionamento_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX relacionamento_id_situacao_relacionamento_idx ON relacionamento USING btree (id_situacao_relacionamento);
+
+
+--
+-- TOC entry 2080 (class 1259 OID 17140)
+-- Name: relacionamento_id_usuario_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX relacionamento_id_usuario_idx ON relacionamento USING btree (id_usuario);
+
+
+--
+-- TOC entry 2090 (class 1259 OID 17141)
+-- Name: usuario_id_funcao_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usuario_id_funcao_idx ON usuario USING btree (id_funcao);
+
+
+--
+-- TOC entry 2093 (class 1259 OID 17144)
+-- Name: visita_id_cliente_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX visita_id_cliente_idx ON visita USING btree (id_cliente);
+
+
+--
+-- TOC entry 2094 (class 1259 OID 17145)
+-- Name: visita_id_situacao_visita_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX visita_id_situacao_visita_idx ON visita USING btree (id_situacao_visita);
+
+
+--
+-- TOC entry 2095 (class 1259 OID 17146)
+-- Name: visita_id_usuario_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX visita_id_usuario_idx ON visita USING btree (id_usuario);
+
+
+--
+-- TOC entry 2240 (class 0 OID 0)
+-- Dependencies: 185
+-- Name: cliente; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE cliente TO atmdigital;
+
+
+--
+-- TOC entry 2242 (class 0 OID 0)
+-- Dependencies: 186
+-- Name: cliente_id_cliente_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE cliente_id_cliente_seq TO atmdigital;
+
+
+--
+-- TOC entry 2243 (class 0 OID 0)
+-- Dependencies: 187
+-- Name: cliente_usuario; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE cliente_usuario TO atmdigital;
+
+
+--
+-- TOC entry 2245 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: cliente_usuario_id_cliente_usuario_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE cliente_usuario_id_cliente_usuario_seq TO atmdigital;
+
+
+--
+-- TOC entry 2246 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: contato; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE contato TO atmdigital;
+
+
+--
+-- TOC entry 2248 (class 0 OID 0)
+-- Dependencies: 190
+-- Name: contato_id_contato_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE contato_id_contato_seq TO atmdigital;
+
+
+--
+-- TOC entry 2249 (class 0 OID 0)
+-- Dependencies: 191
+-- Name: funcao; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE funcao TO atmdigital;
+
+
+--
+-- TOC entry 2251 (class 0 OID 0)
+-- Dependencies: 192
+-- Name: funcao_id_funcao_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE funcao_id_funcao_seq TO atmdigital;
+
+
+--
+-- TOC entry 2252 (class 0 OID 0)
+-- Dependencies: 193
+-- Name: relacionamento; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE relacionamento TO atmdigital;
+
+
+--
+-- TOC entry 2253 (class 0 OID 0)
+-- Dependencies: 194
+-- Name: relacionamento_historico; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE relacionamento_historico TO atmdigital;
+
+
+--
+-- TOC entry 2255 (class 0 OID 0)
+-- Dependencies: 195
+-- Name: relacionamento_historico_id_relacionamento_historico_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE relacionamento_historico_id_relacionamento_historico_seq TO atmdigital;
+
+
+--
+-- TOC entry 2257 (class 0 OID 0)
+-- Dependencies: 196
+-- Name: relacionamento_id_relacionamento_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE relacionamento_id_relacionamento_seq TO atmdigital;
+
+
+--
+-- TOC entry 2258 (class 0 OID 0)
+-- Dependencies: 197
+-- Name: situacao_relacionamento; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE situacao_relacionamento TO atmdigital;
+
+
+--
+-- TOC entry 2259 (class 0 OID 0)
+-- Dependencies: 198
+-- Name: situacao_visita; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE situacao_visita TO atmdigital;
+
+
+--
+-- TOC entry 2260 (class 0 OID 0)
+-- Dependencies: 199
+-- Name: usuario; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE usuario TO atmdigital;
+
+
+--
+-- TOC entry 2262 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: usuario_id_usuario_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE usuario_id_usuario_seq TO atmdigital;
+
+
+--
+-- TOC entry 2263 (class 0 OID 0)
+-- Dependencies: 201
+-- Name: visita; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE visita TO atmdigital;
+
+
+--
+-- TOC entry 2265 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: visita_id_visita_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE visita_id_visita_seq TO atmdigital;
+
+
+-- Completed on 2017-09-13 10:42:07
+
+--
+-- PostgreSQL database dump complete
+--
+
